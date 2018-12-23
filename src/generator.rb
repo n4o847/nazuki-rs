@@ -220,5 +220,106 @@ module Nazuki
       end
       _left
     end
+
+    def sp_print
+      # 負数用の処理 ここから
+      _left
+      _loop do
+        _right
+        _inc(45)
+        _put
+        _set(0)
+        sp_not
+        _left(33)
+        _dec
+        _right
+        _loop { _right }
+        _inc
+        _left
+        _loop { _dec; _left }
+        _inc
+        _right(33)
+        _left
+        _move({ 2 => 1 })
+      end
+      _right(2)
+      _move({ -2 => 1 })
+      _left
+      # ここまで
+      _left(32)
+      # 桁あふれしない正当性：
+      # def check
+      #   mem = []
+      #   31.times do |i|
+      #     digits = (2 ** i).to_s.chars.reverse.map(&:to_i)
+      #     digits.each_with_index do |d, i|
+      #       mem[i] ||= 0
+      #       mem[i] += d
+      #     end
+      #   end
+      #   mem.reduce(0) do |c, d|
+      #     if c + d >= 256
+      #       raise "overflow!!"
+      #     end
+      #     (c + d) / 10
+      #   end
+      # end
+      32.times do |i|
+        digits = (2 ** i).to_s.chars.reverse.map(&:to_i)
+        _loop do
+          _dec
+          _right(32 - i)
+          digits.each do |d|
+            _inc(d)
+            _right(3)
+          end
+          digits.each do
+            _left(3)
+          end
+          _left(32 - i)
+        end
+        _right
+      end
+      9.times do
+        _right
+        _inc(10)
+        _left
+        # https://esolangs.org/wiki/Brainfuck_algorithms#Divmod_algorithm
+        # >n d
+        _raw("[->-[>+>>]>[+[-<+>]>+>>]<<<<<]")
+        # >0 d-n%d n%d n/d
+        _right
+        _set(0)
+        _right
+        _move({ -2 => 1 })
+        _right
+      end
+      9.times do
+        _move({ 1 => 1, 2 => 1 })
+        _right
+        _loop do
+          _loop do
+            _set(0)
+            _left(3)
+            _inc
+            _right(3)
+          end
+          _right
+          _inc(48)
+          _put
+          _set(0)
+          _left
+        end
+        _left(4)
+      end
+      _right
+      _set(0)
+      _left
+      _inc(48)
+      _put
+      _set(0)
+      _left(33)
+      _dec
+    end
   end
 end
