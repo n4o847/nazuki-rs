@@ -114,6 +114,24 @@ module Nazuki
       _dec
     end
 
+    def sp_xor
+      1.upto(32) do |i|
+        d = [i, i - 33].min_by(&:abs)
+        _left
+        _loop do
+          _dec
+          _left(33)
+          _move({ d => -1 })
+          _right(d)
+          _move({ -d => 1 })
+          _inc
+          _right(33 - d)
+        end
+      end
+      _left
+      _dec
+    end
+
     def sp_shl
       27.times do
         _left
