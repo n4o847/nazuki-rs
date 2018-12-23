@@ -42,6 +42,11 @@ module Nazuki
       _raw(".")
     end
 
+    def _set(n)
+      _loop { _dec }
+      _inc(n)
+    end
+
     # 引数は { 相対位置 => 何倍するか } の Hash
     # 位置は変わらない
     def _move(dst)
@@ -78,6 +83,35 @@ module Nazuki
         _move({ -1 => 1 })
       end
       _return
+    end
+
+    def sp_and
+      32.times do
+        _left
+        _dec
+        _loop do
+          _inc
+          _left(33)
+          _set(0)
+          _right(33)
+        end
+      end
+      _left
+      _dec
+    end
+
+    def sp_or
+      32.times do
+        _left
+        _loop do
+          _dec
+          _left(33)
+          _set(1)
+          _right(33)
+        end
+      end
+      _left
+      _dec
     end
   end
 end
