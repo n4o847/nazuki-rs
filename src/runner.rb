@@ -36,6 +36,23 @@ module Nazuki
       end
       @count = 0
       @limit = 10_000_000
+      @input = []
+      @output = []
+    end
+
+    def input(a)
+      if a.is_a?(String)
+        @input += a.bytes
+      elsif a.is_a?(Array)
+        @input += a
+      end
+    end
+
+    def output
+      {
+        bytes: @output,
+        chars: @output.pack('c*').force_encoding('UTF-8'),
+      }
     end
 
     def info
@@ -69,8 +86,10 @@ module Nazuki
         if @mem[@ptr] != 0
           @pc = @corr[@pc]
         end
-      when :get then nil
-      when :put then nil
+      when :get
+        @mem[@ptr] = @input.shift || 0
+      when :put
+        @output.push(@mem[@ptr])
       when nil
         return false
       end
