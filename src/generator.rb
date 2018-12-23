@@ -113,5 +113,94 @@ module Nazuki
       _left
       _dec
     end
+
+    def sp_shl
+      27.times do
+        _left
+        _set(0)
+      end
+      _left
+      _move({ -4 => 16 })
+      _left
+      _move({ -3 => 8 })
+      _left
+      _move({ -2 => 4 })
+      _left
+      _move({ -1 => 2 })
+      _left
+      _loop do
+        _dec
+        _left(2)
+        _set(0)
+        31.times do
+          _left
+          _move({ 1 => 1 })
+        end
+        _right(33)
+      end
+      _left
+      _dec
+    end
+
+    def sp_shr_u
+      27.times do
+        _left
+        _set(0)
+      end
+      _left
+      _move({ -4 => 16 })
+      _left
+      _move({ -3 => 8 })
+      _left
+      _move({ -2 => 4 })
+      _left
+      _move({ -1 => 2 })
+      _left
+      _loop do
+        _dec
+        _left(33)
+        _set(0)
+        31.times do
+          _right
+          _move({ -1 => 1 })
+        end
+        _right(2)
+      end
+      _left
+      _dec
+    end
+
+    def sp_shr_s
+      27.times do
+        _left
+        _set(0)
+      end
+      _left
+      _move({ -4 => 16 })
+      _left
+      _move({ -3 => 8 })
+      _left
+      _move({ -2 => 4 })
+      _left
+      _move({ -1 => 2 })
+      _left(2)
+      _dec
+      _right
+      _loop do
+        _dec
+        _left(33)
+        _set(0)
+        30.times do
+          _right
+          _move({ -1 => 1 })
+        end
+        _right
+        _move({ 1 => 1 })
+        _right
+        _move({ -1 => 1, -2 => 1 })
+        _right
+      end
+      _left
+    end
   end
 end
