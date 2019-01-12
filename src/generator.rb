@@ -112,6 +112,33 @@ module Nazuki
       sp_add
     end
 
+    def sp_mul_10
+      _left
+      _set(0)
+      _left
+      _move({ 1 => 1 })
+      _left
+      _move({ 1 => 1 })
+      29.times do
+        _left
+        _loop do
+          _dec
+          _right(2)
+          _move({ -1 => 1 })
+          _right
+          _loop { _right }
+          _inc
+          _left
+          _loop { _dec; _left }
+          _left
+          _move({ 1 => 1 })
+          _inc
+          _left
+        end
+      end
+      _right(32)
+    end
+
     def sp_not
       32.times do
         _inc
