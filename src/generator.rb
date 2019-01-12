@@ -143,6 +143,7 @@ module Nazuki
         end
       end
       _right(32)
+      _set(0)
     end
 
     def sp_not
