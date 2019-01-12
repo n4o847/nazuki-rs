@@ -295,6 +295,102 @@ module Nazuki
       _left
     end
 
+    def sp_scan
+
+      digit_value = 1
+      flag_loop = 2
+      flag_neg = 3
+
+      eval_digit = lambda do
+        _loop do
+          9.times do
+            _dec
+            _right(digit_value)
+            _inc
+            _left(digit_value)
+            _raw("[")
+          end
+          _set(0)
+          _right(digit_value)
+          _set(0)
+          _left(digit_value)
+          _right(flag_loop)
+          _dec
+          _left(flag_loop)
+          9.times do
+            _raw("]")
+          end
+        end
+      end
+
+      add_digit = lambda do
+        _right(digit_value)
+        _loop do
+          _dec
+          _left(digit_value)
+          _left(32)
+          im_inc
+          _right(32)
+          _set(0)
+          _right(digit_value)
+        end
+        _left(digit_value)
+      end
+
+      _right(33)
+
+      _right(flag_neg)
+      _inc
+      _left(flag_neg)
+      _get
+      _dec(45)
+      _loop do
+        _right(flag_neg)
+        _dec
+        _left(flag_neg)
+        _dec(3)
+        eval_digit[]
+        add_digit[]
+      end
+
+      _right(flag_loop)
+      _inc
+      _loop do
+        _left(flag_loop)
+        _get
+        _dec(48)
+        eval_digit[]
+        _right(flag_loop)
+        _loop do
+          _dec
+          _left(flag_loop)
+          sp_mul_10
+          _inc
+          _right(flag_loop)
+        end
+        _left(flag_loop)
+        _move({ flag_loop => 1 })
+        add_digit[]
+        _right(flag_loop)
+      end
+      _left(flag_loop)
+
+      _left(33)
+      _inc
+      _right(33)
+
+      _right(flag_neg)
+      _loop do
+        _dec
+        _left(flag_neg)
+        sp_not
+        sp_inc
+        _right(flag_neg)
+      end
+      _left(flag_neg)
+
+    end
+
     def sp_print
       # 負数用の処理 ここから
       _left
