@@ -4,6 +4,10 @@ module Nazuki
       @out = ""
     end
 
+    def optimize!
+      @out.gsub!(/\+\g<0>?-|-\g<0>?\+|>\g<0>?<|<\g<0>?>/, "")
+    end
+
     def _raw(s)
       @out << s
     end
