@@ -77,6 +77,17 @@ module Nazuki
       _right
     end
 
+    def sp_inc
+      _left(33)
+      _dec
+      _right
+      im_inc
+      _left
+      _inc
+      _right(33)
+      _set(0)
+    end
+
     def sp_add
       _left(33)
       _dec
@@ -101,13 +112,7 @@ module Nazuki
 
     def sp_sub
       sp_not
-      _left(33)
-      _dec
-      _right
-      im_inc
-      _left
-      _inc
-      _right(33)
+      sp_inc
       sp_add
     end
 
