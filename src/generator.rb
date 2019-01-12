@@ -60,6 +60,11 @@ module Nazuki
       end
     end
 
+    # 呼び出した場所の左隣のセルの値が 0 であること
+    def im_inc
+      _raw("[>]+<[-<]>")
+    end
+
     def sp_const(n)
       if n & 0xffffffff != n
         warn("out of range")
@@ -81,11 +86,7 @@ module Nazuki
         _loop do
           _dec
           _right(33)
-          _loop { _right }
-          _inc
-          _left
-          _loop { _dec; _left }
-          _right
+          im_inc
           _left(33)
         end
         _right(33)
@@ -103,10 +104,8 @@ module Nazuki
       _left(33)
       _dec
       _right
-      _loop { _right }
-      _inc
+      im_inc
       _left
-      _loop { _dec; _left }
       _inc
       _right(33)
       sp_add
@@ -126,11 +125,8 @@ module Nazuki
           _right(2)
           _move({ -1 => 1 })
           _right
-          _loop { _right }
-          _inc
-          _left
-          _loop { _dec; _left }
-          _left
+          im_inc
+          _left(2)
           _move({ 1 => 1 })
           _inc
           _left
@@ -300,10 +296,8 @@ module Nazuki
         _left(33)
         _dec
         _right
-        _loop { _right }
-        _inc
+        im_inc
         _left
-        _loop { _dec; _left }
         _inc
         _right(33)
         _left
