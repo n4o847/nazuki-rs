@@ -65,6 +65,31 @@ module Nazuki
       end
     end
 
+    # 常に *ptr == 0 とする
+    # *(ptr + flag) が
+    #   1 なら yield(true)
+    #   0 なら yield(false)
+    def _branch(flag)
+      _right(flag)
+      _loop do
+        _left(flag)
+        yield(true)
+        _dec
+        _right(flag)
+        _dec
+      end
+      _inc
+      _left(flag)
+      _inc
+      _loop do
+        _dec
+        _right(flag)
+        _dec
+        _left(flag)
+        yield(false)
+      end
+    end
+
     # 呼び出した場所の左隣のセルの値が 0 であること
     def im_inc
       _raw("[>]+<[-<]>")
