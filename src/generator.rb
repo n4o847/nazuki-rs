@@ -350,6 +350,28 @@ module Nazuki
       _left
     end
 
+    def sp_ge_u
+      _left(33)
+      _left(33)
+      _dec
+      1.upto(32) do |i|
+        _right(33 + i)
+        _loop do
+          _dec
+          _left(33)
+          _raw("-[++>-]<[<]>")
+          _right(33)
+        end
+        _left(33 + i)
+        _right(i)
+        _set(0)
+        _left(i)
+      end
+      _inc
+      _right(33)
+      _move({ -32 => 1 })
+    end
+
     def sp_scan
 
       digit_value = 1
