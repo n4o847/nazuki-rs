@@ -350,6 +350,26 @@ module Nazuki
       _left
     end
 
+    def sp_flip_msb_2
+      _inc
+      _left(1)
+      _move({ 1 => -1 })
+      _right(1)
+      _move({ -1 => 1 })
+      _left(33)
+      _left(1)
+      _move({ 1 => -1 })
+      _right(1)
+      _move({ -1 => 1 })
+      _inc
+      _right(33)
+    end
+
+    def sp_ge_s
+      sp_flip_msb_2
+      sp_ge_u
+    end
+
     def sp_ge_u
       _left(33)
       _left(33)
