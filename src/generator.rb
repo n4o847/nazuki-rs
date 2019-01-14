@@ -372,6 +372,17 @@ module Nazuki
       _right(33)
     end
 
+    def sp_flip_lsb
+      _left(32)
+      _raw("[-<->]<[->+<]+>")
+      _right(32)
+    end
+
+    def sp_eq
+      sp_ne
+      sp_flip_lsb
+    end
+
     def sp_ne
       _left
       32.times do
