@@ -365,12 +365,7 @@ module Nazuki
       _right(33)
     end
 
-    def sp_ge_s
-      sp_flip_msb_2
-      sp_ge_u
-    end
-
-    def sp_ge_u
+    def sp_lt_u_or_ge_u(type)
       _left(33)
       _left(33)
       _dec
@@ -388,8 +383,36 @@ module Nazuki
         _left(i)
       end
       _inc
-      _right(33)
-      _move({ -32 => 1 })
+      case type
+      when :lt_u
+        _right(1)
+        _inc
+        _right(32)
+        _move({ -32 => -1 })
+      when :ge_u
+        _right(33)
+        _move({ -32 => 1 })
+      else
+        raise "type not specified"
+      end
+    end
+
+    def sp_lt_s
+      sp_flip_msb_2
+      sp_lt_u
+    end
+
+    def sp_lt_u
+      sp_lt_u_or_ge_u(:lt_u)
+    end
+
+    def sp_ge_s
+      sp_flip_msb_2
+      sp_ge_u
+    end
+
+    def sp_ge_u
+      sp_lt_u_or_ge_u(:ge_u)
     end
 
     def sp_scan
