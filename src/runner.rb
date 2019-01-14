@@ -63,6 +63,24 @@ module Nazuki
       }
     end
 
+    def inspect
+      res = ""
+      o = output
+      res << "output:\n"
+      res << "  bytes: #{ o[:bytes].inspect }\n"
+      res << "  chars: #{ o[:chars].inspect }\n"
+      res << "memory:\n"
+      @mem.map.with_index do |a, i|
+        x = sprintf("%02X", a)
+        i == @ptr ? "[#{x}]" : " #{x} "
+      end.each_slice(33).each do |a, *b|
+        res << (" |" + a + "|" + b.join + "\n").gsub(/00/, "__").gsub(/ (?= )| (?=\[)|(?<=\]) /, "")
+      end
+      res << "ptr: #{ @ptr }\n"
+      res << "count: #{ @count }\n"
+      res
+    end
+
     def step
       if @count >= @limit
         raise "operation limit exceeded"
@@ -109,7 +127,7 @@ module Nazuki
     def run
       while step
       end
-      info
+      self
     end
 
     def self.run(code)
