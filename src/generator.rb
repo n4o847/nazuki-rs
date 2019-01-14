@@ -372,6 +372,36 @@ module Nazuki
       _right(33)
     end
 
+    def sp_ne
+      _left
+      32.times do
+        _loop do
+          _dec
+          _left(33)
+          _dec
+          _loop do
+            _inc
+            _right
+            _inc
+            _left
+          end
+          _right(33)
+        end
+        _left
+      end
+      _dec
+      32.times do
+        _loop do
+          _set(0)
+          _left
+          _set(1)
+          _right
+        end
+        _left
+      end
+      _right(32)
+    end
+
     def sp_lt_u_or_ge_u(type)
       _left(33)
       _left(33)
