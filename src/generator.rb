@@ -121,8 +121,15 @@ module Nazuki
     end
 
     # 呼び出した場所の左隣のセルの値が 0 であること
+    # 繰り上がりに注意
     def im_inc
       _raw("[>]+<[-<]>")
+    end
+
+    # 呼び出した場所の左隣のセルの値が 0 であること
+    # 繰り下がりに注意
+    def im_dec
+      _raw("-[++>-]<[<]>")
     end
 
     def sp_const(n)
@@ -374,7 +381,7 @@ module Nazuki
         _loop do
           _dec
           _left(33)
-          _raw("-[++>-]<[<]>")
+          im_dec
           _right(33)
         end
         _left(33 + i)
@@ -397,18 +404,70 @@ module Nazuki
       end
     end
 
+    def sp_gt_u_or_le_u(type)
+      _inc
+      _left(33)
+      _dec
+      _left(33)
+      1.upto(32) do |i|
+        _right(i)
+        _loop do
+          _dec
+          _right(33)
+          im_dec
+          _left(33)
+        end
+        _left(i)
+        _right(33 + i)
+        _set(0)
+        _left(33 + i)
+      end
+      case type
+      when :gt_u
+        _right(1)
+        _inc
+        _right(65)
+        _move({ -65 => -1 })
+        _left(33)
+      when :le_u
+        _right(66)
+        _move({ -65 => 1 })
+        _left(33)
+      else
+        raise "type not specified"
+      end
+    end
+
     def sp_lt_s
       sp_flip_msb_2
       sp_lt_u
+    end
+
+    def sp_le_s
+      sp_flip_msb_2
+      sp_le_u
     end
 
     def sp_lt_u
       sp_lt_u_or_ge_u(:lt_u)
     end
 
+    def sp_le_u
+      sp_gt_u_or_le_u(:le_u)
+    end
+
+    def sp_gt_s
+      sp_flip_msb_2
+      sp_gt_u
+    end
+
     def sp_ge_s
       sp_flip_msb_2
       sp_ge_u
+    end
+
+    def sp_gt_u
+      sp_gt_u_or_le_u(:gt_u)
     end
 
     def sp_ge_u
