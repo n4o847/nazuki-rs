@@ -144,6 +144,30 @@ module Nazuki
       _right
     end
 
+    def sp_dup
+      32.downto(1) do |i|
+        _left(33 - i)
+        _loop do
+          _dec
+          _right(33 - i)
+          _inc
+          _right(i)
+          _inc
+          _left(i)
+          _left(33 - i)
+        end
+        _right(33 - i)
+        _loop do
+          _dec
+          _left(33 - i)
+          _inc
+          _right(33 - i)
+        end
+      end
+      _inc
+      _right(33)
+    end
+
     def sp_inc
       _left(33)
       _dec
