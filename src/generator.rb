@@ -99,6 +99,14 @@ module Nazuki
       _left(src)
     end
 
+    # src: 複写元
+    # tmp: 複写に使う一時メモリ
+    # dst_to_scl: { 複写先 => 何倍するか }
+    def _copy(src, tmp, dst_to_scl)
+      _move(src, { tmp => 1 }.merge(dst_to_scl))
+      _move(tmp, src => 1)
+    end
+
     # 常に *ptr == 0 とする
     # *(ptr + flag) が
     #   1 なら yield(true)
@@ -150,23 +158,7 @@ module Nazuki
 
     def sp_dup
       32.downto(1) do |i|
-        _left(33 - i)
-        _loop do
-          _dec
-          _right(33 - i)
-          _inc
-          _right(i)
-          _inc
-          _left(i)
-          _left(33 - i)
-        end
-        _right(33 - i)
-        _loop do
-          _dec
-          _left(33 - i)
-          _inc
-          _right(33 - i)
-        end
+        _copy(i - 33, 0, i => 1)
       end
       _inc
       _right(33)
