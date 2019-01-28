@@ -82,17 +82,21 @@ module Nazuki
       _inc(n)
     end
 
-    # 引数は { 相対位置 => 何倍するか } の Hash
-    # 位置は変わらない
-    def _move(dst)
+    # src: 転送元
+    # dst_to_scl: { 転送先 => 何倍するか }
+    def _move(src, dst_to_scl)
+      _right(src)
       _loop do
         _dec
-        dst.each do |p, a|
-          _right(p)
-          _inc(a)
-          _left(p)
+        _left(src)
+        dst_to_scl.each do |dst, scl|
+          _right(dst)
+          _inc(scl)
+          _left(dst)
         end
+        _right(src)
       end
+      _left(src)
     end
 
     # 常に *ptr == 0 とする
@@ -192,7 +196,7 @@ module Nazuki
           _left(33)
         end
         _right(33)
-        _move({ -33 => 1 })
+        _move(0, { -33 => 1 })
         _left(33)
       end
       _right
@@ -211,19 +215,19 @@ module Nazuki
       _left
       _set(0)
       _left
-      _move({ 1 => 1 })
+      _move(0, { 1 => 1 })
       _left
-      _move({ 1 => 1 })
+      _move(0, { 1 => 1 })
       29.times do
         _left
         _loop do
           _dec
           _right(2)
-          _move({ -1 => 1 })
+          _move(0, { -1 => 1 })
           _right
           im_inc
           _left(2)
-          _move({ 1 => 1 })
+          _move(0, { 1 => 1 })
           _inc
           _left
         end
@@ -236,11 +240,11 @@ module Nazuki
       32.times do
         _inc
         _left
-        _move({ 1 => -1 })
+        _move(0, { 1 => -1 })
       end
       32.times do
         _right
-        _move({ -1 => 1 })
+        _move(0, { -1 => 1 })
       end
       _return
     end
@@ -281,9 +285,9 @@ module Nazuki
         _loop do
           _dec
           _left(33)
-          _move({ d => -1 })
+          _move(0, { d => -1 })
           _right(d)
-          _move({ -d => 1 })
+          _move(0, { -d => 1 })
           _inc
           _right(33 - d)
         end
@@ -298,13 +302,13 @@ module Nazuki
         _set(0)
       end
       _left
-      _move({ -4 => 16 })
+      _move(0, { -4 => 16 })
       _left
-      _move({ -3 => 8 })
+      _move(0, { -3 => 8 })
       _left
-      _move({ -2 => 4 })
+      _move(0, { -2 => 4 })
       _left
-      _move({ -1 => 2 })
+      _move(0, { -1 => 2 })
       _left
       _loop do
         _dec
@@ -312,7 +316,7 @@ module Nazuki
         _set(0)
         31.times do
           _left
-          _move({ 1 => 1 })
+          _move(0, { 1 => 1 })
         end
         _right(33)
       end
@@ -326,13 +330,13 @@ module Nazuki
         _set(0)
       end
       _left
-      _move({ -4 => 16 })
+      _move(0, { -4 => 16 })
       _left
-      _move({ -3 => 8 })
+      _move(0, { -3 => 8 })
       _left
-      _move({ -2 => 4 })
+      _move(0, { -2 => 4 })
       _left
-      _move({ -1 => 2 })
+      _move(0, { -1 => 2 })
       _left
       _loop do
         _dec
@@ -340,7 +344,7 @@ module Nazuki
         _set(0)
         31.times do
           _right
-          _move({ -1 => 1 })
+          _move(0, { -1 => 1 })
         end
         _right(2)
       end
@@ -354,13 +358,13 @@ module Nazuki
         _set(0)
       end
       _left
-      _move({ -4 => 16 })
+      _move(0, { -4 => 16 })
       _left
-      _move({ -3 => 8 })
+      _move(0, { -3 => 8 })
       _left
-      _move({ -2 => 4 })
+      _move(0, { -2 => 4 })
       _left
-      _move({ -1 => 2 })
+      _move(0, { -1 => 2 })
       _left(2)
       _dec
       _right
@@ -370,12 +374,12 @@ module Nazuki
         _set(0)
         30.times do
           _right
-          _move({ -1 => 1 })
+          _move(0, { -1 => 1 })
         end
         _right
-        _move({ 1 => 1 })
+        _move(0, { 1 => 1 })
         _right
-        _move({ -1 => 1, -2 => 1 })
+        _move(0, { -1 => 1, -2 => 1 })
         _right
       end
       _left
@@ -384,14 +388,14 @@ module Nazuki
     def sp_flip_msb_2
       _inc
       _left(1)
-      _move({ 1 => -1 })
+      _move(0, { 1 => -1 })
       _right(1)
-      _move({ -1 => 1 })
+      _move(0, { -1 => 1 })
       _left(33)
       _left(1)
-      _move({ 1 => -1 })
+      _move(0, { 1 => -1 })
       _right(1)
-      _move({ -1 => 1 })
+      _move(0, { -1 => 1 })
       _inc
       _right(33)
     end
@@ -460,10 +464,10 @@ module Nazuki
         _right(1)
         _inc
         _right(32)
-        _move({ -32 => -1 })
+        _move(0, { -32 => -1 })
       when :ge_u
         _right(33)
-        _move({ -32 => 1 })
+        _move(0, { -32 => 1 })
       else
         raise "type not specified"
       end
@@ -492,11 +496,11 @@ module Nazuki
         _right(1)
         _inc
         _right(65)
-        _move({ -65 => -1 })
+        _move(0, { -65 => -1 })
         _left(33)
       when :le_u
         _right(66)
-        _move({ -65 => 1 })
+        _move(0, { -65 => 1 })
         _left(33)
       else
         raise "type not specified"
@@ -613,7 +617,7 @@ module Nazuki
           _right(flag_loop)
         end
         _left(flag_loop)
-        _move({ flag_loop => 1 })
+        _move(0, { flag_loop => 1 })
         add_digit[]
         _right(flag_loop)
       end
@@ -652,10 +656,10 @@ module Nazuki
         _inc
         _right(33)
         _left
-        _move({ 2 => 1 })
+        _move(0, { 2 => 1 })
       end
       _right(2)
-      _move({ -2 => 1 })
+      _move(0, { -2 => 1 })
       _left
       # ここまで
       _left(32)
@@ -703,11 +707,11 @@ module Nazuki
         _right
         _set(0)
         _right
-        _move({ -2 => 1 })
+        _move(0, { -2 => 1 })
         _right
       end
       9.times do
-        _move({ 1 => 1, 2 => 1 })
+        _move(0, { 1 => 1, 2 => 1 })
         _right
         _loop do
           _loop do
