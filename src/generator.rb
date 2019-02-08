@@ -182,9 +182,6 @@ module Nazuki
     end
 
     def sp_const(n)
-      if n & 0xffffffff != n
-        warn("out of range")
-      end
       _inc
       32.times do |i|
         _right
@@ -644,6 +641,8 @@ module Nazuki
               end
             end
           end
+        else
+          raise "type not specified"
         end
       end
       _right(33)
