@@ -48,6 +48,14 @@ module Nazuki
     end
 
     def _inc(n = 1)
+      while n > 0 && @out.end_with?("-")
+        @out[-1] = ""
+        n -= 1
+      end
+      while n < 0 && @out.end_with?("+")
+        @out[-1] = ""
+        n += 1
+      end
       _raw(n.positive? ? "+" * n : "-" * -n)
     end
 
@@ -56,6 +64,14 @@ module Nazuki
     end
 
     def _right(n = 1)
+      while n > 0 && @out.end_with?("<")
+        @out[-1] = ""
+        n -= 1
+      end
+      while n < 0 && @out.end_with?(">")
+        @out[-1] = ""
+        n += 1
+      end
       _raw(n.positive? ? ">" * n : "<" * -n)
     end
 
