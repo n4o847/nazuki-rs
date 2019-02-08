@@ -82,6 +82,35 @@ module Nazuki
       _inc(n)
     end
 
+    def _set2(pos, val)
+      _right(pos)
+      _loop { _dec }
+      _inc(val)
+      _left(pos)
+  end
+
+    def _while(src)
+      _right(src)
+      _loop do
+        _left(src)
+        yield
+        _right(src)
+      end
+      _left(src)
+    end
+
+    def _add(src, val)
+      _right(src)
+      _inc(val)
+      _left(src)
+    end
+
+    def _sub(src, val)
+      _right(src)
+      _dec(val)
+      _left(src)
+    end
+
     # src: 転送元
     # dst_to_scl: { 転送先 => 何倍するか }
     def _move(src, dst_to_scl)
@@ -107,27 +136,35 @@ module Nazuki
       _move(tmp, src => 1)
     end
 
-    # 常に *ptr == 0 とする
-    # *(ptr + flag) が
+    # 常に *tmp == 0 とする
+    # *flg が
     #   1 なら yield(true)
     #   0 なら yield(false)
-    def _branch(flag)
-      _right(flag)
-      _loop do
-        _left(flag)
+    def _branch(flg, tmp)
+      _while(flg) do
         yield(true)
-        _dec
-        _right(flag)
-        _dec
+        _sub(tmp, 1)
+        _sub(flg, 1)
       end
-      _inc
-      _left(flag)
-      _inc
-      _loop do
-        _dec
-        _right(flag)
-        _dec
-        _left(flag)
+      _add(flg, 1)
+      _add(tmp, 1)
+      _while(tmp) do
+        _sub(tmp, 1)
+        _sub(flg, 1)
+        yield(false)
+      end
+    end
+
+    # 破壊的バージョン
+    def _branch!(flg, tmp)
+      _while(flg) do
+        yield(true)
+        _sub(tmp, 1)
+        _sub(flg, 1)
+      end
+      _add(tmp, 1)
+      _while(tmp) do
+        _sub(tmp, 1)
         yield(false)
       end
     end
@@ -533,6 +570,58 @@ module Nazuki
 
     def sp_ge_u
       sp_lt_u_or_ge_u(:ge_u)
+    end
+
+    def sp_max_u
+      _left(33)
+      _dec
+      _left(33)
+
+      temp1 = 33
+      use_first = 67
+      use_second = 68
+
+      33.downto(1) do |i|
+        keep_flag = i != 1
+        _add(temp1, 1)
+        _while(use_first) do
+          _sub(use_first, 1)
+          _sub(temp1, 1)
+          _set2(33 + i, 0)
+          use_first -= 1 # for optimization
+          _add(use_first, 1) if keep_flag
+        end
+        _while(use_second) do
+          _sub(use_second, 1)
+          _sub(temp1, 1)
+          _set2(i, 0)
+          _move(33 + i, { i => 1 })
+          use_second -= 1 # for optimization
+          _add(use_second, 1) if keep_flag
+        end
+        _while(temp1) do
+          _while(33 + i) do
+            _sub(33 + i, 1)
+            _sub(i, 1)
+            _while(i) do
+              _add(i, 1)
+              _add(use_second, 1) if keep_flag
+            end
+            _add(i, 1)
+            _sub(temp1, 1)
+          end
+          _while(temp1) do
+            _sub(temp1, 1)
+            _while(i) do
+              _sub(i, 1)
+              _add(use_first, 1) if keep_flag
+              _add(temp1, 1)
+            end
+            _move(temp1, { i => 1 })
+          end
+        end
+      end
+      _right(33)
     end
 
     def sp_scan
