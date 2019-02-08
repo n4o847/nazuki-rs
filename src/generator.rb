@@ -278,6 +278,41 @@ module Nazuki
       _set(0)
     end
 
+    def sp_mul
+      _left(33)
+      _dec
+      _left(33)
+      _dec
+
+      temp1 = 33
+      a = *1..32, 0
+      b = *34..65
+
+      0.upto(31) do |i|
+        _move(a[i], { a[i - 1] => 1 })
+      end
+      31.downto(0) do |i|
+        _while(a[i - 1]) do
+          _sub(a[i - 1], 1)
+          0.upto(31 - i) do |j|
+            _branch(b[j], temp1) do |_| if _
+              _move(a[i + j - 1], { a[i - 1] => 1 }) if j != 0
+              _right(a[i + j])
+              im_inc
+              _left(a[i + j])
+              _set2(temp1, 0)
+              _move(a[i - 1], { a[i + j - 1] => 1 }) if j != 0
+            end end
+          end
+        end
+      end
+      31.downto(0) do |j|
+        _set2(b[j], 0)
+      end
+      _inc
+      _right(33)
+    end
+
     def sp_not
       32.times do
         _inc
