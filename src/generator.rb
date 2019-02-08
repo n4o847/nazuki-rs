@@ -300,8 +300,8 @@ module Nazuki
               _right(a[i + j])
               im_inc
               _left(a[i + j])
-              _set2(temp1, 0)
               _move(a[i - 1], { a[i + j - 1] => 1 }) if j != 0
+              _set2(temp1, 0)
             end end
           end
         end
