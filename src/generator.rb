@@ -574,13 +574,7 @@ module Nazuki
       sp_lt_u_or_ge_u(:ge_u)
     end
 
-    def sp_max_s
-      sp_flip_msb_2
-      sp_max_u
-      sp_flip_msb
-    end
-
-    def sp_max_u
+    def sp_max_u_or_min_u(type)
       _left(33)
       _dec
       _left(33)
@@ -589,7 +583,7 @@ module Nazuki
       use_first = 67
       use_second = 68
 
-      33.downto(1) do |i|
+      32.downto(1) do |i|
         keep_flag = i != 1
         _add(temp1, 1)
         _while(use_first) do
@@ -607,29 +601,72 @@ module Nazuki
           use_second -= 1 # for optimization
           _add(use_second, 1) if keep_flag
         end
-        _while(temp1) do
-          _while(33 + i) do
-            _sub(33 + i, 1)
-            _sub(i, 1)
-            _while(i) do
-              _add(i, 1)
-              _add(use_second, 1) if keep_flag
-            end
-            _add(i, 1)
-            _sub(temp1, 1)
-          end
+        case type
+        when :max_u
           _while(temp1) do
-            _sub(temp1, 1)
-            _while(i) do
+            _while(33 + i) do # if b[i] == 1
+              _sub(33 + i, 1)
               _sub(i, 1)
-              _add(use_first, 1) if keep_flag
-              _add(temp1, 1)
+              _while(i) do # if a[i] == 0
+                _add(i, 1)
+                _add(use_second, 1) if keep_flag
+              end
+              _add(i, 1)
+              _sub(temp1, 1)
             end
-            _move(temp1, { i => 1 })
+            _while(temp1) do # if b[i] == 0
+              _sub(temp1, 1)
+              _while(i) do # if a[i] == 1
+                _sub(i, 1)
+                _add(use_first, 1) if keep_flag
+                _add(temp1, 1)
+              end
+              _move(temp1, { i => 1 })
+            end
+          end
+        when :min_u
+          _while(temp1) do
+            _while(33 + i) do # if b[i] == 1
+              _sub(33 + i, 1)
+              _sub(i, 1)
+              _while(i) do # if a[i] == 0
+                _add(i, 1)
+                _add(use_first, 1) if keep_flag
+                _sub(temp1, 1)
+              end
+              _move(temp1, { i => 1 })
+            end
+            _while(temp1) do # if b[i] == 0
+              _sub(temp1, 1)
+              _while(i) do # if a[i] == 1
+                _sub(i, 1)
+                _add(use_second, 1) if keep_flag
+              end
+            end
           end
         end
       end
       _right(33)
+    end
+
+    def sp_max_s
+      sp_flip_msb_2
+      sp_max_u
+      sp_flip_msb
+    end
+
+    def sp_max_u
+      sp_max_u_or_min_u(:max_u)
+    end
+
+    def sp_min_s
+      sp_flip_msb_2
+      sp_min_u
+      sp_flip_msb
+    end
+
+    def sp_min_u
+      sp_max_u_or_min_u(:min_u)
     end
 
     def sp_scan
