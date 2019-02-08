@@ -414,17 +414,19 @@ module Nazuki
       _left
     end
 
-    def sp_flip_msb_2
+    def sp_flip_msb
       _inc
       _left(1)
       _move(0, { 1 => -1 })
       _right(1)
       _move(0, { -1 => 1 })
+    end
+
+    def sp_flip_msb_2
+      sp_flip_msb
       _left(33)
-      _left(1)
-      _move(0, { 1 => -1 })
-      _right(1)
-      _move(0, { -1 => 1 })
+      _dec
+      sp_flip_msb
       _inc
       _right(33)
     end
@@ -570,6 +572,12 @@ module Nazuki
 
     def sp_ge_u
       sp_lt_u_or_ge_u(:ge_u)
+    end
+
+    def sp_max_s
+      sp_flip_msb_2
+      sp_max_u
+      sp_flip_msb
     end
 
     def sp_max_u
