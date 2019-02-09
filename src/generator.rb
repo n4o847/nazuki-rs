@@ -187,8 +187,10 @@ module Nazuki
 
     # 呼び出した場所の左隣のセルの値が 0 であること
     # 繰り上がりに注意
-    def im_inc
+    def im_inc(lsb = 0)
+      _right(lsb)
       _raw("[>]+<[-<]>")
+      _left(lsb)
     end
 
     # 呼び出した場所の左隣のセルの値が 0 であること
@@ -297,12 +299,11 @@ module Nazuki
           0.upto(31 - i) do |j|
             _while(b[j]) do
               _sub(b[j], 1)
-              _right(a[i + j])
-              im_inc
-              _left(a[i + j])
-              _set2(temp1, 1)
+              im_inc(a[i + j])
+              _set2(temp1, 0)
+              _add(temp1, 1) if i != 0
             end
-            _move(temp1, { b[j] => 1 })
+            _move(temp1, { b[j] => 1 }) if i != 0
             _move(a[i + j], { a[i + j - 1] => 1 }) if j != 31 - i
           end
           (31 - i).downto(0) do |j|
