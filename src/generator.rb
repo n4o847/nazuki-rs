@@ -295,14 +295,18 @@ module Nazuki
         _while(a[i - 1]) do
           _sub(a[i - 1], 1)
           0.upto(31 - i) do |j|
-            _branch(b[j], temp1) do |_| if _
-              _move(a[i + j - 1], { a[i - 1] => 1 }) if j != 0
+            _while(b[j]) do
+              _sub(b[j], 1)
               _right(a[i + j])
               im_inc
               _left(a[i + j])
-              _move(a[i - 1], { a[i + j - 1] => 1 }) if j != 0
-              _set2(temp1, 0)
-            end end
+              _set2(temp1, 1)
+            end
+            _move(temp1, { b[j] => 1 })
+            _move(a[i + j], { a[i + j - 1] => 1 }) if j != 31 - i
+          end
+          (31 - i).downto(0) do |j|
+            _move(a[i + j - 1], { a[i + j] => 1 }) if j != 31 - i
           end
         end
       end
