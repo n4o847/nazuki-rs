@@ -70,11 +70,12 @@ module Nazuki
       res << "  bytes: #{ o[:bytes].inspect }\n"
       res << "  chars: #{ o[:chars].inspect }\n"
       res << "memory:\n"
-      @mem.map.with_index do |a, i|
+      drop_from = [@mem.rindex {|v| v != 0 } || -1, @ptr].max + 1
+      @mem[0...drop_from].map.with_index do |a, i|
         x = sprintf("%02X", a)
         i == @ptr ? "[#{x}]" : " #{x} "
       end.each_slice(33).each do |a, *b|
-        res << (" |" + a + "|" + b.join + "\n").gsub(/00/, "__").gsub(/ (?= )| (?=\[)|(?<=\]) /, "")
+        res << "  " << ("|" + a + "|" + b.join).gsub(/00/, "__").gsub(/ (?= )| (?=\[)|(?<=\]) /, "") << "\n"
       end
       res << "ptr: #{ @ptr }\n"
       res << "count: #{ @count }\n"
