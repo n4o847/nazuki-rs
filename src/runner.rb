@@ -82,7 +82,18 @@ module Nazuki
           period = 33
         end
         head, *tail = mem.shift(period)
-        res << "  " << ("|" + head + "|" + tail.join).gsub(/00/, "__").gsub(/ (?= )| (?=\[)|(?<=\]) /, "") << "\n"
+        value = 0
+        tail.each_with_index do |x, i|
+          if x["00"]
+          elsif x["01"]
+            value |= 1 << i
+          else
+            value = nil
+            break
+          end
+        end
+        value |= -1 << 32 if value[31] == 1
+        res << "  " << ("|" + head + "|" + tail.join).gsub(/00/, "__").gsub(/ (?= )| (?=\[)|(?<=\]) /, "") << "( #{ value } )" << "\n"
       end
       res << "ptr: #{ @ptr }\n"
       res << "count: #{ @count }\n"
