@@ -213,20 +213,20 @@ module Nazuki
       _loop { _right(33) }
     end
 
-    def main(ops)
+    def main(program)
 
       tmp = 0
       cmd = *1..8
 
-      ins_set = ops.uniq
+      ins_set = program.uniq
       if ins_set.size > 256
         raise "too large set of instructions"
       end
 
       _dec
       _right(9)
-      ops.reverse.each do |op|
-        bits = ins_set.index(op)
+      program.reverse.each do |ins|
+        bits = ins_set.index(ins)
         0.upto(7) do |i|
           _add(cmd[i], bits[i])
         end
@@ -246,7 +246,7 @@ module Nazuki
           else
             if ins_set[bits]
               ip_to_sp
-              send(ins_set[bits])
+              send(*ins_set[bits])
               sp_to_ip
             end
           end
