@@ -71,11 +71,18 @@ module Nazuki
       res << "  chars: #{ o[:chars].inspect }\n"
       res << "memory:\n"
       drop_from = [@mem.rindex {|v| v != 0 } || -1, @ptr].max + 1
-      @mem[0...drop_from].map.with_index do |a, i|
+      mem = @mem[0...drop_from].map.with_index do |a, i|
         x = sprintf("%02X", a)
         i == @ptr ? "[#{x}]" : " #{x} "
-      end.each_slice(33).each do |a, *b|
-        res << "  " << ("|" + a + "|" + b.join).gsub(/00/, "__").gsub(/ (?= )| (?=\[)|(?<=\]) /, "") << "\n"
+      end
+      period = 9
+      head = ""
+      until mem.empty?
+        if head["01"] && mem[0]["00"]
+          period = 33
+        end
+        head, *tail = mem.shift(period)
+        res << "  " << ("|" + head + "|" + tail.join).gsub(/00/, "__").gsub(/ (?= )| (?=\[)|(?<=\]) /, "") << "\n"
       end
       res << "ptr: #{ @ptr }\n"
       res << "count: #{ @count }\n"
