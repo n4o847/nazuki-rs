@@ -764,18 +764,12 @@ module Nazuki
         _loop do
           9.times do
             _dec
-            _right(digit_value)
-            _inc
-            _left(digit_value)
+            _add(digit_value, 1)
             _raw("[")
           end
           _set(0)
-          _right(digit_value)
-          _set(0)
-          _left(digit_value)
-          _right(flag_loop)
-          _dec
-          _left(flag_loop)
+          _set2(digit_value, 0)
+          _sub(flag_loop, 1)
           9.times do
             _raw("]")
           end
@@ -783,70 +777,50 @@ module Nazuki
       end
 
       add_digit = lambda do
-        _right(digit_value)
-        _loop do
-          _dec
-          _left(digit_value)
+        _while(digit_value) do
+          _sub(digit_value, 1)
           _left(32)
           im_inc
           _right(32)
           _set(0)
-          _right(digit_value)
         end
-        _left(digit_value)
       end
 
       _right(33)
 
-      _right(flag_neg)
-      _inc
-      _left(flag_neg)
+      _add(flag_neg, 1)
       _get
       _dec(45)
       _loop do
-        _right(flag_neg)
-        _dec
-        _left(flag_neg)
+        _sub(flag_neg, 1)
         _dec(3)
         eval_digit[]
         add_digit[]
       end
 
-      _right(flag_loop)
-      _inc
-      _loop do
-        _left(flag_loop)
+      _add(flag_loop, 1)
+      _while(flag_loop) do
         _get
         _dec(48)
         eval_digit[]
-        _right(flag_loop)
-        _loop do
-          _dec
-          _left(flag_loop)
+        _while(flag_loop) do
+          _sub(flag_loop, 1)
           sp_mul_10
           _inc
-          _right(flag_loop)
         end
-        _left(flag_loop)
         _move(0, { flag_loop => 1 })
         add_digit[]
-        _right(flag_loop)
       end
-      _left(flag_loop)
 
       _left(33)
       _inc
       _right(33)
 
-      _right(flag_neg)
-      _loop do
-        _dec
-        _left(flag_neg)
+      _while(flag_neg) do
+        _sub(flag_neg, 1)
         sp_not
         sp_inc
-        _right(flag_neg)
       end
-      _left(flag_neg)
 
     end
 
