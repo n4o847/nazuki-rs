@@ -103,7 +103,7 @@ module Nazuki
       _loop { _dec }
       _inc(val)
       _left(pos)
-  end
+    end
 
     def _while(src)
       _right(src)
@@ -197,6 +197,71 @@ module Nazuki
     # 繰り下がりに注意
     def im_dec
       _raw("-[++>-]<[<]>")
+    end
+
+    def sp_to_ip
+      _left(33)
+      _loop { _left(33) }
+      _left(9)
+      _loop { _left(9) }
+    end
+
+    def ip_to_sp
+      _right(9)
+      _loop { _right(9) }
+      _right(33)
+      _loop { _right(33) }
+    end
+
+    def main(ops)
+
+      tmp = 0
+      cmd = *1..8
+
+      ins_set = ops.uniq
+      if ins_set.size > 256
+        raise "too large set of instructions"
+      end
+
+      _dec
+      _right(9)
+      ops.reverse.each do |op|
+        bits = ins_set.index(op)
+        0.upto(7) do |i|
+          _add(cmd[i], bits[i])
+        end
+        _right(9)
+      end
+      _left(9)
+      _inc
+      _while(tmp) do
+        _sub(tmp, 1)
+        see_bit = lambda do |i, bits|
+          if i >= 0
+            _branch(cmd[i], tmp) do |_| if _
+              see_bit[i - 1, bits | 1 << i]
+            else
+              see_bit[i - 1, bits]
+            end end
+          else
+            if ins_set[bits]
+              ip_to_sp
+              send(ins_set[bits])
+              sp_to_ip
+            end
+          end
+        end
+        see_bit[7, 0]
+        _add(tmp, 1)
+        _left(9)
+        _add(tmp, 1)
+      end
+    end
+
+    def ip_exit
+      _left(9)
+      _dec
+      _right(9)
     end
 
     def sp_const(n)
