@@ -4,41 +4,6 @@ module Nazuki
       @out = ""
     end
 
-    def optimize!(level = 1)
-      case level
-      when 1
-        @out.gsub!(/\+\g<0>?-|-\g<0>?\+|>\g<0>?<|<\g<0>?>/, "")
-      when 2
-        @out.gsub!(/[+\-><]+/) do |matched|
-          gen = Generator.new
-          ptr = 0
-          mem = Hash.new(0)
-          matched.each_char do |char|
-            case char
-            when "+"
-              mem[ptr] += 1
-            when "-"
-              mem[ptr] -= 1
-            when ">"
-              ptr += 1
-            when "<"
-              ptr -= 1
-            end
-          end
-          vis = ptr >= 0 ? mem.sort : mem.sort.reverse
-          qtr = 0
-          vis.each do |abs, val|
-            gen._right(abs - qtr)
-            gen._inc(val)
-            qtr = abs
-          end
-          gen._right(ptr - qtr)
-          gen._return
-        end
-      end
-      @out
-    end
-
     def _raw(s)
       @out << s
     end
