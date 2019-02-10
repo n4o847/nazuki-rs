@@ -48,10 +48,14 @@ module Nazuki
       end
     end
 
+    def chars(s)
+      s.pack('c*').force_encoding('UTF-8')
+    end
+
     def output
       {
         bytes: @output,
-        chars: @output.pack('c*').force_encoding('UTF-8'),
+        chars: chars(@output),
       }
     end
 
@@ -65,10 +69,13 @@ module Nazuki
 
     def inspect
       res = ""
-      o = output
+      res << "size: #{ @code.size }\n"
+      res << "input:\n"
+      res << "  #{ @input.inspect }\n"
+      res << "  #{ chars(@input).inspect }\n"
       res << "output:\n"
-      res << "  bytes: #{ o[:bytes].inspect }\n"
-      res << "  chars: #{ o[:chars].inspect }\n"
+      res << "  #{ @output.inspect }\n"
+      res << "  #{ chars(@output).inspect }\n"
       res << "memory:\n"
       drop_from = [@mem.rindex {|v| v != 0 } || -1, @ptr].max + 1
       mem = @mem[0...drop_from].map.with_index do |a, i|
