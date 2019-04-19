@@ -1,7 +1,15 @@
-const nazuki = import('nazuki');
+import "./style.css";
 
-nazuki
-  .then(m => {
-    console.log(m.generate());
-  })
-  .catch(console.error);
+const $result = document.getElementById("result");
+
+async function load() {
+  const nazuki = await import('nazuki');
+
+  $result.value = nazuki.generate();
+}
+
+try {
+  load();
+} catch (e) {
+  console.error(e);
+}
