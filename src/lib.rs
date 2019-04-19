@@ -1,12 +1,9 @@
 extern crate wasm_bindgen;
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
+mod generator;
 
 #[wasm_bindgen]
-pub fn greet(name: &str) {
-    alert(&format!("Hello, {}!", name));
+pub fn generate() -> String {
+    generator::generate()
 }

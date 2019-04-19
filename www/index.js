@@ -2,6 +2,6 @@ const nazuki = import('nazuki');
 
 nazuki
   .then(m => {
-    m.greet('world');
+    console.log(m.generate());
   })
   .catch(console.error);
