@@ -24,7 +24,7 @@ impl Generator {
         Generator { cmds: Vec::new() }
     }
 
-    fn build(&mut self) -> String {
+    fn build(&self) -> String {
         let mut result = String::new();
         for cmd in &self.cmds {
             let ch = match cmd {
