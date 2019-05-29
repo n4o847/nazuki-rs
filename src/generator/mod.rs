@@ -228,6 +228,20 @@ impl Generator {
             alt(s);
         });
     }
+
+    fn i32_const(&mut self, a: i32) {
+        mem! {
+            head: 0,
+            body: 1..=32,
+            terminus: 33,
+        }
+
+        self.add(head, 1);
+        for i in 0..32 {
+            self.add(body[i], a >> i & 1);
+        }
+        self.enter(terminus);
+    }
 }
 
 pub fn generate() -> String {
