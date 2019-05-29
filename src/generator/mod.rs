@@ -13,7 +13,7 @@ enum BfCmd {
     Put,
 }
 
-struct Ptr(i32);
+struct Ptr(isize);
 
 struct Generator {
     cmds: Vec<BfCmd>,
@@ -139,7 +139,7 @@ impl Generator {
         self.cmds.push(BfCmd::Put);
     }
 
-    fn right(&mut self, x: i32) {
+    fn right(&mut self, x: isize) {
         for _ in 0..x {
             self.bf_right();
         }
@@ -148,7 +148,7 @@ impl Generator {
         }
     }
 
-    fn left(&mut self, x: i32) {
+    fn left(&mut self, x: isize) {
         self.right(-x);
     }
 
