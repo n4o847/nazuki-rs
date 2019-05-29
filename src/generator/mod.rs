@@ -29,8 +29,6 @@ enum BfCmd {
     Put,
 }
 
-struct Ptr(isize);
-
 struct Generator {
     cmds: Vec<BfCmd>,
 }
@@ -96,14 +94,14 @@ impl Generator {
                 return Err("too large set of instructions");
             }
             for i in 0..8 {
-                self.add(&Ptr(cmd + i), (bits >> i) & 1);
+                self.add(cmd + i, (bits >> i) & 1);
             }
             self.right(9);
         }
         self.left(9);
         self.bf_inc();
-        self.r#while(&Ptr(tmp), |s| {
-            s.sub(&Ptr(tmp), 1);
+        self.r#while(tmp, |s| {
+            s.sub(tmp, 1);
             // TODO
         });
         return Ok(self.build());
@@ -170,15 +168,15 @@ impl Generator {
         self.right(-x);
     }
 
-    fn enter(&mut self, p: &Ptr) {
-        self.right(p.0);
+    fn enter(&mut self, p: isize) {
+        self.right(p);
     }
 
-    fn exit(&mut self, p: &Ptr) {
-        self.left(p.0);
+    fn exit(&mut self, p: isize) {
+        self.left(p);
     }
 
-    fn add(&mut self, p: &Ptr, x: i32) {
+    fn add(&mut self, p: isize, x: i32) {
         self.enter(p);
         for _ in 0..x {
             self.bf_inc();
@@ -189,11 +187,11 @@ impl Generator {
         self.exit(p);
     }
 
-    fn sub(&mut self, p: &Ptr, x: i32) {
+    fn sub(&mut self, p: isize, x: i32) {
         self.add(p, -x);
     }
 
-    fn r#while<F: FnMut(&mut Self)>(&mut self, p: &Ptr, mut block: F) {
+    fn r#while<F: FnMut(&mut Self)>(&mut self, p: isize, mut block: F) {
         self.enter(p);
         self.bf_open();
         self.exit(p);
@@ -203,7 +201,7 @@ impl Generator {
         self.exit(p);
     }
 
-    fn set(&mut self, p: &Ptr, x: i32) {
+    fn set(&mut self, p: isize, x: i32) {
         self.r#while(p, |s| {
             s.bf_dec();
         });
@@ -212,8 +210,8 @@ impl Generator {
 
     fn r#if<F1: FnMut(&mut Self), F2: FnMut(&mut Self)>(
         &mut self,
-        flg: &Ptr,
-        tmp: &Ptr,
+        flg: isize,
+        tmp: isize,
         mut cons: F1,
         mut alt: F2,
     ) {
