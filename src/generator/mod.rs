@@ -1,6 +1,18 @@
 use isa::Inst;
 use std::collections::HashMap;
 
+macro_rules! mem {
+    () => {};
+    ($x:ident : $a:tt, $($rest:tt)*) => {
+        let $x: isize = $a;
+        mem! { $($rest)* }
+    };
+    ($x:ident : $a:tt .. $b:tt, $($rest:tt)*) => {
+        let $x: Vec<isize> = ($a..$b).collect();
+        mem! { $($rest)* }
+    };
+}
+
 #[derive(PartialEq)]
 enum BfCmd {
     Inc,
@@ -59,8 +71,10 @@ impl Generator {
     }
 
     fn main(&mut self, program: &[Inst]) -> Result<String, &str> {
-        let tmp = 0;
-        let cmd = 1;
+        mem! {
+            tmp: 0,
+            cmd: 1,
+        }
 
         let mut inst_map = HashMap::new();
 
