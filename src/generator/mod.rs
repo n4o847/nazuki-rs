@@ -11,6 +11,10 @@ macro_rules! mem {
         let $x: Vec<isize> = ($a..$b).collect();
         mem! { $($rest)* }
     };
+    ($x:ident : $a:tt ..= $b:tt, $($rest:tt)*) => {
+        let $x: Vec<isize> = ($a..=$b).collect();
+        mem! { $($rest)* }
+    };
 }
 
 #[derive(PartialEq)]
