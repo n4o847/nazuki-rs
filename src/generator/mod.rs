@@ -261,7 +261,7 @@ impl Generator {
                 s.set(a_body[i], 0);
             });
         }
-        self.set(b_head, 0);
+        self.sub(b_head, 1);
         self.enter(end_point);
     }
 
@@ -282,7 +282,7 @@ impl Generator {
                 s.set(a_body[i], 1);
             });
         }
-        self.set(b_head, 0);
+        self.sub(b_head, 1);
         self.enter(end_point);
     }
 
