@@ -285,6 +285,38 @@ impl Generator {
         self.set(b_head, 0);
         self.enter(end_point);
     }
+
+    fn i32_xor(&mut self) {
+        mem! {
+            start_point: 66,
+            a_head: 0,
+            a_body: 1..=32,
+            b_head: 33,
+            b_body: 34..=65,
+            end_point: 33,
+        }
+
+        self.exit(start_point);
+        // rev のほうが若干短い？
+        for i in (0..32).rev() {
+            self.r#while(b_body[i], |s| {
+                s.sub(b_body[i], 1);
+                // i < 13 で分けると生成コードが一番短くなる。
+                let temp = if i < 13 { a_head } else { b_head };
+                s.r#while(a_body[i], |t| {
+                    t.sub(a_body[i], 1);
+                    t.sub(temp, 1);
+                });
+                s.r#while(temp, |t| {
+                    t.sub(temp, 1);
+                    t.add(a_body[i], 1);
+                });
+                s.add(temp, 1);
+            });
+        }
+        self.sub(b_head, 1);
+        self.enter(end_point);
+    }
 }
 
 pub fn generate() -> String {
