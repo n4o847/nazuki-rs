@@ -191,6 +191,18 @@ impl Generator {
         self.add(p, -x);
     }
 
+    fn get(&mut self, p: isize) {
+        self.enter(p);
+        self.bf_get();
+        self.exit(p);
+    }
+
+    fn put(&mut self, p: isize) {
+        self.enter(p);
+        self.bf_put();
+        self.exit(p);
+    }
+
     fn r#while<F: FnMut(&mut Self)>(&mut self, p: isize, mut block: F) {
         self.enter(p);
         self.bf_open();
