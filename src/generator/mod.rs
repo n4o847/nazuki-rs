@@ -264,6 +264,27 @@ impl Generator {
         self.set(b_head, 0);
         self.enter(end_point);
     }
+
+    fn i32_or(&mut self) {
+        mem! {
+            start_point: 66,
+            _a_head: 0,
+            a_body: 1..=32,
+            b_head: 33,
+            b_body: 34..=65,
+            end_point: 33,
+        }
+
+        self.exit(start_point);
+        for i in (0..32).rev() {
+            self.r#while(b_body[i], |s| {
+                s.sub(b_body[i], 1);
+                s.set(a_body[i], 1);
+            });
+        }
+        self.set(b_head, 0);
+        self.enter(end_point);
+    }
 }
 
 pub fn generate() -> String {
