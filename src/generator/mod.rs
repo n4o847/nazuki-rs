@@ -317,6 +317,40 @@ impl Generator {
         self.sub(b_head, 1);
         self.enter(end_point);
     }
+
+    fn i32_shl(&mut self) {
+        mem! {
+            start_point: 66,
+            _a_head: 0,
+            a_body: 1..=32,
+            b_head: 33,
+            b_body: 34..=65,
+            end_point: 33,
+        }
+
+        self.exit(start_point);
+        for i in (5..32).rev() {
+            self.set(b_body[i], 0);
+        }
+        for i in (1..=4).rev() {
+            self.r#while(b_body[i], |s| {
+                s.sub(b_body[i], 1);
+                s.add(b_body[0], 1 << i);
+            });
+        }
+        self.r#while(b_body[0], |s| {
+            s.sub(b_body[0], 1);
+            s.set(a_body[31], 0);
+            for i in (0..31).rev() {
+                s.r#while(a_body[i], |t| {
+                    t.sub(a_body[i], 1);
+                    t.add(a_body[i + 1], 1);
+                });
+            }
+        });
+        self.sub(b_head, 1);
+        self.enter(end_point);
+    }
 }
 
 pub fn generate() -> String {
