@@ -203,7 +203,7 @@ impl Generator {
 
     fn set(&mut self, p: isize, x: i32) {
         self.r#while(p, |s| {
-            s.bf_dec();
+            s.sub(p, 1);
         });
         self.add(p, x);
     }
