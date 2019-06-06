@@ -405,6 +405,102 @@ impl Generator {
         self.sub(b_head, 1);
         self.enter(end_point);
     }
+
+    fn i32_print(&mut self) {
+        mem! {
+            start_point: 33,
+            head: 0,
+            body: 1..=32,
+            temp: 33,
+            temp_0: 34,
+            end_point: 0,
+        }
+
+        self.exit(start_point);
+        // 負数用の処理 ここから
+        self.r#while(body[31], |s| {
+            s.add(temp, 45);
+            s.put(temp);
+            s.set(temp, 0);
+            s.enter(start_point);
+            s.i32_not();
+            s.exit(start_point);
+            s.sub(head, 1);
+            s.incs(body[0]);
+            s.add(head, 1);
+            s.r#while(body[31], |s| {
+                s.sub(body[31], 1);
+                s.add(temp_0, 1);
+            });
+        });
+        self.r#while(temp_0, |s| {
+            s.sub(temp_0, 1);
+            s.add(body[31], 1);
+        });
+        // 負数用の処理 ここまで
+        // 2 ** 31 に注意
+        for i in 0..32 {
+            let mut digits = (1 << i) as u32;
+            self.r#while(body[i], |s| {
+                s.sub(body[i], 1);
+                let mut j = 0;
+                while digits > 0 {
+                    let d = (digits % 10) as i32;
+                    s.add(temp + 3 * j, d);
+                    digits /= 10;
+                    j += 1;
+                }
+            });
+        }
+        for j in 0..9 {
+            let dividend = temp + 3 * j;
+            let divisor = temp + 3 * j + 1;
+            let remainder = temp + 3 * j + 2;
+            let _quotient = temp + 3 * j + 3;
+            self.add(divisor, 10);
+            self.enter(dividend);
+            // https://esolangs.org/wiki/Brainfuck_algorithms#Divmod_algorithm
+            // >n d
+            self.raw("[->-[>+>>]>[+[-<+>]>+>>]<<<<<]");
+            // >0 d-n%d n%d n/d
+            self.exit(dividend);
+            self.set(divisor, 0);
+            self.r#while(remainder, |s| {
+                s.sub(remainder, 1);
+                s.add(dividend, 1);
+            });
+        }
+        for j in (1..10).rev() {
+            let s1 = temp + 3 * j - 2;
+            let t0 = temp + 3 * j;
+            let t1 = temp + 3 * j + 1;
+            let t2 = temp + 3 * j + 2;
+            self.r#while(t0, |s| {
+                s.sub(t0, 1);
+                s.add(t1, 1);
+                s.add(t2, 1);
+            });
+            self.r#while(t1, |s| {
+                s.r#while(t1, |s| {
+                    s.set(t1, 0);
+                    s.add(s1, 1);
+                });
+                s.add(t2, 48);
+                s.put(t2);
+                s.set(t2, 0);
+            });
+        }
+        {
+            let t0 = temp;
+            let t1 = temp + 1;
+            self.set(t1, 0);
+            self.add(t0, 48);
+            self.put(t0);
+            self.set(t0, 0);
+        }
+        self.sub(head, 1);
+        self.enter(end_point);
+    }
 }
 
 pub fn generate() -> String {
