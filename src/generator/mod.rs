@@ -255,6 +255,32 @@ impl Generator {
         self.enter(terminus);
     }
 
+    fn i32_not(&mut self) {
+        mem! {
+            start_point: 33,
+            _head: 0,
+            body: 1..=32,
+            helper: 2..=33,
+            end_point: 33,
+        }
+
+        self.exit(start_point);
+        for i in (0..32).rev() {
+            self.add(helper[i], 1);
+            self.r#while(body[i], |s| {
+                s.sub(body[i], 1);
+                s.sub(helper[i], 1);
+            });
+        }
+        for i in 0..32 {
+            self.r#while(helper[i], |s| {
+                s.sub(helper[i], 1);
+                s.add(body[i], 1);
+            });
+        }
+        self.enter(end_point);
+    }
+
     fn i32_and(&mut self) {
         mem! {
             start_point: 66,
