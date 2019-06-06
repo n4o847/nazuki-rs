@@ -503,6 +503,28 @@ impl Generator {
     }
 }
 
+#[test]
+fn i32_print_keep_within_range() {
+    let mut cells = vec![0; 10];
+    for i in 0..32 {
+        let mut digits = (1 << i) as u32;
+        let mut j = 0;
+        while digits > 0 {
+            let d = (digits % 10) as i32;
+            cells[j] += d;
+            digits /= 10;
+            j += 1;
+        }
+    }
+    let mut carry = 0;
+    for value in cells {
+        if value + carry >= 256 {
+            panic!("overflow!!");
+        }
+        carry = (value + carry) / 10;
+    }
+}
+
 pub fn generate() -> String {
     let mut gen = Generator::new();
     gen.raw(">+++++++++[<++++++++>-]<.>+++++++[<++++>-]<+.+++++++..+++.[-]>++++++++[<++++>-]<.>+++++++++++[<+++++>-]<.>++++++++[<+++>-]<.+++.------.--------.[-]>++++++++[<++++>-]<+.[-]++++++++++.");
