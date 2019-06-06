@@ -241,6 +241,22 @@ impl Generator {
         });
     }
 
+    // 呼び出した場所の左隣のセルの値が 0 であること
+    // 繰り上がりに注意
+    fn incs(&mut self, p: isize) {
+        self.enter(p);
+        self.raw("[>]+<[-<]>");
+        self.exit(p);
+    }
+
+    // 呼び出した場所の左隣のセルの値が 0 であること
+    // 繰り下がりに注意
+    fn decs(&mut self, p: isize) {
+        self.enter(p);
+        self.raw("-[++>-]<[<]>");
+        self.exit(p);
+    }
+
     fn i32_const(&mut self, a: i32) {
         mem! {
             head: 0,
