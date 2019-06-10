@@ -295,8 +295,13 @@ impl Generator {
         self.ip_to_sp();
         match *inst {
             Inst::I32Const(a) => self.i32_const(a),
+            Inst::I32Not => self.i32_not(),
+            Inst::I32And => self.i32_and(),
+            Inst::I32Or => self.i32_or(),
+            Inst::I32Xor => self.i32_xor(),
+            Inst::I32Shl => self.i32_shl(),
+            Inst::I32Inc => self.i32_inc(),
             Inst::I32Print => self.i32_print(),
-            _ => (),
         }
         self.sp_to_ip();
     }
