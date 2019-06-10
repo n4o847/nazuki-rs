@@ -72,46 +72,6 @@ impl Generator {
         }
     }
 
-    fn main(&mut self, program: Vec<Inst>) -> Result<String, &str> {
-        mem! {
-            tmp: 0,
-            cmd: 1..=8,
-        }
-
-        let mut inst_map = HashMap::new();
-        let mut inst_vec = Vec::new();
-
-        self.bf_dec();
-        self.right(9);
-        for inst in program.iter().rev() {
-            let bits = if let Some(&bits) = inst_map.get(inst) {
-                bits
-            } else {
-                let bits = inst_map.len() as i32;
-                inst_map.insert(inst, bits);
-                inst_vec.push(inst);
-                bits
-            };
-            if bits > 256 {
-                return Err("too large set of instructions");
-            }
-            for i in 0..8 {
-                self.add(cmd[i], bits >> i & 1);
-            }
-            self.right(9);
-        }
-        self.left(9);
-        self.bf_inc();
-        self.r#while(tmp, |s| {
-            s.sub(tmp, 1);
-            s.inst_branch(7, 0, &inst_vec[..]);
-            s.add(tmp, 1);
-            s.left(9);
-            s.add(tmp, 1);
-        });
-        return Ok(self.build());
-    }
-
     fn bf_inc(&mut self) {
         if self.cmds.last() == Some(&BfCmd::Dec) {
             self.cmds.pop();
@@ -260,6 +220,46 @@ impl Generator {
         self.enter(p);
         self.raw("-[++>-]<[<]>");
         self.exit(p);
+    }
+
+    fn main(&mut self, program: Vec<Inst>) -> Result<String, &str> {
+        mem! {
+            tmp: 0,
+            cmd: 1..=8,
+        }
+
+        let mut inst_map = HashMap::new();
+        let mut inst_vec = Vec::new();
+
+        self.bf_dec();
+        self.right(9);
+        for inst in program.iter().rev() {
+            let bits = if let Some(&bits) = inst_map.get(inst) {
+                bits
+            } else {
+                let bits = inst_map.len() as i32;
+                inst_map.insert(inst, bits);
+                inst_vec.push(inst);
+                bits
+            };
+            if bits > 256 {
+                return Err("too large set of instructions");
+            }
+            for i in 0..8 {
+                self.add(cmd[i], bits >> i & 1);
+            }
+            self.right(9);
+        }
+        self.left(9);
+        self.bf_inc();
+        self.r#while(tmp, |s| {
+            s.sub(tmp, 1);
+            s.inst_branch(7, 0, &inst_vec[..]);
+            s.add(tmp, 1);
+            s.left(9);
+            s.add(tmp, 1);
+        });
+        return Ok(self.build());
     }
 
     fn inst_branch(&mut self, i: i32, bit: i32, inst_vec: &[&Inst]) {
