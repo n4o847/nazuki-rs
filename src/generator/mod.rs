@@ -72,13 +72,14 @@ impl Generator {
         }
     }
 
-    fn main(&mut self, program: &[Inst]) -> Result<String, &str> {
+    fn main(&mut self, program: Vec<Inst>) -> Result<String, &str> {
         mem! {
             tmp: 0,
-            cmd: 1,
+            cmd: 1..=8,
         }
 
         let mut inst_map = HashMap::new();
+        let mut inst_vec = Vec::new();
 
         self.bf_dec();
         self.right(9);
@@ -88,13 +89,14 @@ impl Generator {
             } else {
                 let bits = inst_map.len() as i32;
                 inst_map.insert(inst, bits);
+                inst_vec.push(inst);
                 bits
             };
             if bits > 256 {
                 return Err("too large set of instructions");
             }
             for i in 0..8 {
-                self.add(cmd + i, (bits >> i) & 1);
+                self.add(cmd[i], bits >> i & 1);
             }
             self.right(9);
         }
@@ -102,7 +104,10 @@ impl Generator {
         self.bf_inc();
         self.r#while(tmp, |s| {
             s.sub(tmp, 1);
-            // TODO
+            s.inst_branch(7, 0, &inst_vec[..]);
+            s.add(tmp, 1);
+            s.left(9);
+            s.add(tmp, 1);
         });
         return Ok(self.build());
     }
@@ -255,6 +260,67 @@ impl Generator {
         self.enter(p);
         self.raw("-[++>-]<[<]>");
         self.exit(p);
+    }
+
+    fn inst_branch(&mut self, i: i32, bit: i32, inst_vec: &[&Inst]) {
+        mem! {
+            tmp: 0,
+            cmd: 1..=8,
+        }
+
+        let len = inst_vec.len() as i32;
+        if len == 0 {
+            return;
+        } else if i < 0 {
+            if let Some(inst) = inst_vec.get(bit as usize) {
+                self.inst_put(inst);
+            }
+        } else if len <= bit | 1 << i {
+            self.inst_branch(i - 1, bit, inst_vec);
+        } else {
+            self.r#if(
+                cmd[i as usize],
+                tmp,
+                |s| {
+                    s.inst_branch(i - 1, bit | 1 << i, inst_vec);
+                },
+                |s| {
+                    s.inst_branch(i - 1, bit, inst_vec);
+                },
+            );
+        }
+    }
+
+    fn inst_put(&mut self, inst: &Inst) {
+        self.ip_to_sp();
+        match *inst {
+            Inst::I32Const(a) => self.i32_const(a),
+            Inst::I32Print => self.i32_print(),
+            _ => (),
+        }
+        self.sp_to_ip();
+    }
+
+    fn sp_to_ip(&mut self) {
+        self.left(33);
+        self.bf_open();
+        self.left(33);
+        self.bf_close();
+        self.left(9);
+        self.bf_open();
+        self.left(9);
+        self.bf_close();
+    }
+
+    fn ip_to_sp(&mut self) {
+        self.right(9);
+        self.bf_open();
+        self.right(9);
+        self.bf_close();
+        self.right(33);
+        self.bf_open();
+        self.right(33);
+        self.bf_close();
     }
 
     fn i32_const(&mut self, a: i32) {
@@ -544,6 +610,5 @@ fn i32_print_keep_within_range() {
 
 pub fn generate() -> String {
     let mut gen = Generator::new();
-    gen.raw(">+++++++++[<++++++++>-]<.>+++++++[<++++>-]<+.+++++++..+++.[-]>++++++++[<++++>-]<.>+++++++++++[<+++++>-]<.>++++++++[<+++>-]<.+++.------.--------.[-]>++++++++[<++++>-]<+.[-]++++++++++.");
-    gen.build()
+    gen.main(vec![Inst::I32Const(334), Inst::I32Print]).unwrap()
 }
