@@ -406,6 +406,23 @@ impl Generator {
         self.enter(end_point);
     }
 
+    fn i32_inc(&mut self) {
+        mem! {
+            start_point: 33,
+            head: 0,
+            body: 1..=32,
+            carry: 33,
+            end_point: 0,
+        }
+
+        self.exit(start_point);
+        self.sub(head, 1);
+        self.incs(body[0]);
+        self.add(head, 1);
+        self.set(carry, 0);
+        self.enter(end_point);
+    }
+
     fn i32_print(&mut self) {
         mem! {
             start_point: 33,
