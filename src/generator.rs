@@ -168,7 +168,7 @@ impl Generator {
         self.exit(p);
     }
 
-    fn r#while<F: FnMut(&mut Self)>(&mut self, p: isize, mut block: F) {
+    fn while_<F: FnMut(&mut Self)>(&mut self, p: isize, mut block: F) {
         self.enter(p);
         self.bf_open();
         self.exit(p);
@@ -179,27 +179,27 @@ impl Generator {
     }
 
     fn set(&mut self, p: isize, x: i32) {
-        self.r#while(p, |s| {
+        self.while_(p, |s| {
             s.sub(p, 1);
         });
         self.add(p, x);
     }
 
-    fn r#if<F1: FnMut(&mut Self), F2: FnMut(&mut Self)>(
+    fn if_<F1: FnMut(&mut Self), F2: FnMut(&mut Self)>(
         &mut self,
         flg: isize,
         tmp: isize,
         mut cons: F1,
         mut alt: F2,
     ) {
-        self.r#while(flg, |s| {
+        self.while_(flg, |s| {
             cons(s);
             s.sub(tmp, 1);
             s.sub(flg, 1);
         });
         self.add(flg, 1);
         self.add(tmp, 1);
-        self.r#while(tmp, |s| {
+        self.while_(tmp, |s| {
             s.sub(tmp, 1);
             s.sub(flg, 1);
             alt(s);
@@ -252,7 +252,7 @@ impl Generator {
         }
         self.left(9);
         self.bf_inc();
-        self.r#while(tmp, |s| {
+        self.while_(tmp, |s| {
             s.sub(tmp, 1);
             s.inst_branch(7, 0, &inst_vec[..]);
             s.add(tmp, 1);
@@ -278,7 +278,7 @@ impl Generator {
         } else if len <= bit | 1 << i {
             self.inst_branch(i - 1, bit, inst_vec);
         } else {
-            self.r#if(
+            self.if_(
                 cmd[i as usize],
                 tmp,
                 |s| {
@@ -354,13 +354,13 @@ impl Generator {
         self.exit(start_point);
         for i in (0..32).rev() {
             self.add(helper[i], 1);
-            self.r#while(body[i], |s| {
+            self.while_(body[i], |s| {
                 s.sub(body[i], 1);
                 s.sub(helper[i], 1);
             });
         }
         for i in 0..32 {
-            self.r#while(helper[i], |s| {
+            self.while_(helper[i], |s| {
                 s.sub(helper[i], 1);
                 s.add(body[i], 1);
             });
@@ -381,7 +381,7 @@ impl Generator {
         self.exit(start_point);
         for i in (0..32).rev() {
             self.sub(b_body[i], 1);
-            self.r#while(b_body[i], |s| {
+            self.while_(b_body[i], |s| {
                 s.add(b_body[i], 1);
                 s.set(a_body[i], 0);
             });
@@ -402,7 +402,7 @@ impl Generator {
 
         self.exit(start_point);
         for i in (0..32).rev() {
-            self.r#while(b_body[i], |s| {
+            self.while_(b_body[i], |s| {
                 s.sub(b_body[i], 1);
                 s.set(a_body[i], 1);
             });
@@ -424,15 +424,15 @@ impl Generator {
         self.exit(start_point);
         // rev のほうが若干短い？
         for i in (0..32).rev() {
-            self.r#while(b_body[i], |s| {
+            self.while_(b_body[i], |s| {
                 s.sub(b_body[i], 1);
                 // i < 13 で分けると生成コードが一番短くなる。
                 let temp = if i < 13 { a_head } else { b_head };
-                s.r#while(a_body[i], |t| {
+                s.while_(a_body[i], |t| {
                     t.sub(a_body[i], 1);
                     t.sub(temp, 1);
                 });
-                s.r#while(temp, |t| {
+                s.while_(temp, |t| {
                     t.sub(temp, 1);
                     t.add(a_body[i], 1);
                 });
@@ -458,16 +458,16 @@ impl Generator {
             self.set(b_body[i], 0);
         }
         for i in (1..=4).rev() {
-            self.r#while(b_body[i], |s| {
+            self.while_(b_body[i], |s| {
                 s.sub(b_body[i], 1);
                 s.add(b_body[0], 1 << i);
             });
         }
-        self.r#while(b_body[0], |s| {
+        self.while_(b_body[0], |s| {
             s.sub(b_body[0], 1);
             s.set(a_body[31], 0);
             for i in (0..31).rev() {
-                s.r#while(a_body[i], |t| {
+                s.while_(a_body[i], |t| {
                     t.sub(a_body[i], 1);
                     t.add(a_body[i + 1], 1);
                 });
@@ -506,7 +506,7 @@ impl Generator {
 
         self.exit(start_point);
         // 負数用の処理 ここから
-        self.r#while(body[31], |s| {
+        self.while_(body[31], |s| {
             s.add(temp, 45);
             s.put(temp);
             s.set(temp, 0);
@@ -516,12 +516,12 @@ impl Generator {
             s.sub(head, 1);
             s.incs(body[0]);
             s.add(head, 1);
-            s.r#while(body[31], |s| {
+            s.while_(body[31], |s| {
                 s.sub(body[31], 1);
                 s.add(temp_0, 1);
             });
         });
-        self.r#while(temp_0, |s| {
+        self.while_(temp_0, |s| {
             s.sub(temp_0, 1);
             s.add(body[31], 1);
         });
@@ -529,7 +529,7 @@ impl Generator {
         // 2 ** 31 に注意
         for i in 0..32 {
             let mut digits = (1 << i) as u32;
-            self.r#while(body[i], |s| {
+            self.while_(body[i], |s| {
                 s.sub(body[i], 1);
                 let mut j = 0;
                 while digits > 0 {
@@ -553,7 +553,7 @@ impl Generator {
             // >0 d-n%d n%d n/d
             self.exit(dividend);
             self.set(divisor, 0);
-            self.r#while(remainder, |s| {
+            self.while_(remainder, |s| {
                 s.sub(remainder, 1);
                 s.add(dividend, 1);
             });
@@ -563,13 +563,13 @@ impl Generator {
             let t0 = temp + 3 * j;
             let t1 = temp + 3 * j + 1;
             let t2 = temp + 3 * j + 2;
-            self.r#while(t0, |s| {
+            self.while_(t0, |s| {
                 s.sub(t0, 1);
                 s.add(t1, 1);
                 s.add(t2, 1);
             });
-            self.r#while(t1, |s| {
-                s.r#while(t1, |s| {
+            self.while_(t1, |s| {
+                s.while_(t1, |s| {
                     s.set(t1, 0);
                     s.add(s1, 1);
                 });
