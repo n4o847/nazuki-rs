@@ -1,23 +1,15 @@
 # nazuki
+
 A language that compiles into Brainfuck
 
-
-## 開発サーバ起動
+## Develop
 
 ```
-npm run serve
+npm start
 ```
 
-## ビルド
+## Build
 
 ```
 npm run build
-```
-
-## デプロイ
-
-GitHub Pages へのデプロイ
-
-```
-npm run deploy
 ```
