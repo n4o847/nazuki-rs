@@ -5,11 +5,6 @@ const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 
 module.exports = {
   entry: './www/index.js',
-  resolve: {
-    alias: {
-      nazuki: path.resolve(__dirname, 'pkg'),
-    },
-  },
   module: {
     rules: [
       {
@@ -21,6 +16,11 @@ module.exports = {
       },
     ],
   },
+  resolve: {
+    alias: {
+      nazuki: path.resolve(__dirname, 'pkg'),
+    },
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './www/index.html')
@@ -30,4 +30,7 @@ module.exports = {
       crateDirectory: path.resolve(__dirname, '.')
     }),
   ],
+  experiments: {
+    asyncWebAssembly: true,
+  },
 };
